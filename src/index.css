@@ -1,0 +1,221 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ── Dark Theme (Default) ────────────────────────────────────── */
+:root {
+  --radius: 0.625rem;
+  --background: oklch(0.098 0.012 280);
+  --foreground: oklch(0.96 0.005 280);
+  --card: oklch(0.14 0.012 280);
+  --card-foreground: oklch(0.96 0.005 280);
+  --popover: oklch(0.14 0.012 280);
+  --popover-foreground: oklch(0.96 0.005 280);
+  --primary: oklch(0.7 0.18 270);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.18 0.012 280);
+  --secondary-foreground: oklch(0.9 0.005 280);
+  --muted: oklch(0.18 0.012 280);
+  --muted-foreground: oklch(0.6 0.015 280);
+  --accent: oklch(0.22 0.015 280);
+  --accent-foreground: oklch(0.96 0.005 280);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.7 0.18 270);
+  --chart-1: oklch(0.7 0.18 270);
+  --chart-2: oklch(0.65 0.2 190);
+  --chart-3: oklch(0.75 0.15 50);
+  --chart-4: oklch(0.6 0.2 300);
+  --chart-5: oklch(0.65 0.22 15);
+  --sidebar: oklch(0.12 0.012 280);
+  --sidebar-foreground: oklch(0.96 0.005 280);
+  --sidebar-primary: oklch(0.7 0.18 270);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.18 0.012 280);
+  --sidebar-accent-foreground: oklch(0.96 0.005 280);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.7 0.18 270);
+}
+
+/* ── Light Theme ─────────────────────────────────────────────── */
+.light {
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.14 0.005 280);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.14 0.005 280);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.14 0.005 280);
+  --primary: oklch(0.5 0.22 270);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.96 0.002 280);
+  --secondary-foreground: oklch(0.2 0.006 280);
+  --muted: oklch(0.96 0.002 280);
+  --muted-foreground: oklch(0.5 0.015 280);
+  --accent: oklch(0.96 0.002 280);
+  --accent-foreground: oklch(0.2 0.006 280);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.004 280);
+  --input: oklch(0.9 0.004 280);
+  --ring: oklch(0.5 0.22 270);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+/* ── Custom Utilities ────────────────────────────────────────── */
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, oklch(0.75 0.2 270), oklch(0.7 0.22 300), oklch(0.75 0.18 230));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Accent text (deep red — matches Hero curves) */
+.accent-text {
+  color: oklch(0.58 0.2 18);
+}
+
+/* Gradient button bg */
+.gradient-primary {
+  background: linear-gradient(135deg, oklch(0.6 0.22 270), oklch(0.55 0.24 300));
+}
+
+.gradient-primary:hover {
+  background: linear-gradient(135deg, oklch(0.65 0.22 270), oklch(0.6 0.24 300));
+}
+
+/* Glass morphism */
+.glass {
+  background: oklch(1 0 0 / 5%);
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  border: 1px solid oklch(1 0 0 / 8%);
+}
+
+/* Glow effect */
+.glow-purple {
+  box-shadow: 0 0 60px 10px oklch(0.5 0.2 270 / 20%),
+    0 0 120px 30px oklch(0.5 0.2 290 / 10%);
+}
+
+/* Animate on scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.4 0.01 280);
+  border-radius: 99px;
+}
+
+/* Floating animation */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Pulse glow */
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
