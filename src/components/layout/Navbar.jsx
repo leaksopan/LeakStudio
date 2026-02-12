@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import {
     NavigationMenu,
@@ -14,6 +15,7 @@ import {
     Menu, X, ChevronDown, ChevronRight,
     ShoppingCart, Camera, Layers,
     Store, UtensilsCrossed, Briefcase, ImageIcon,
+    LogOut, LayoutDashboard,
 } from 'lucide-react'
 
 /* ─────────────── Navigation Data ─────────────── */
@@ -70,6 +72,8 @@ const navLinks = [
 /* ─────────────── Component ─────────────── */
 
 function Navbar() {
+    const { isAuthenticated, loading: authLoading, signOut } = useAuth()
+    const navigate = useNavigate()
     const [scrolled, setScrolled] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const [activeSolusiIdx, setActiveSolusiIdx] = useState(0)
@@ -208,21 +212,51 @@ function Navbar() {
 
                     {/* ── Desktop CTA ── */}
                     <div className="hidden md:flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="rounded-full text-xs font-medium px-4 h-8 text-muted-foreground hover:text-foreground"
-                            asChild
-                        >
-                            <Link to="/login">Login</Link>
-                        </Button>
-                        <Button
-                            size="sm"
-                            className="rounded-full text-xs font-medium px-4 h-8 bg-[oklch(0.58_0.2_18)] hover:bg-[oklch(0.52_0.2_18)] text-white"
-                            asChild
-                        >
-                            <Link to="/register">Coba Gratis</Link>
-                        </Button>
+                        {!authLoading && isAuthenticated ? (
+                            <>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="rounded-full text-xs font-medium px-4 h-8 text-muted-foreground hover:text-foreground"
+                                    asChild
+                                >
+                                    <Link to="/dashboard">
+                                        <LayoutDashboard className="h-3.5 w-3.5 mr-1.5" />
+                                        Dashboard
+                                    </Link>
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="rounded-full text-xs font-medium px-4 h-8 text-muted-foreground hover:text-foreground"
+                                    onClick={async () => {
+                                        await signOut()
+                                        navigate('/')
+                                    }}
+                                >
+                                    <LogOut className="h-3.5 w-3.5 mr-1.5" />
+                                    Sign Out
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="rounded-full text-xs font-medium px-4 h-8 text-muted-foreground hover:text-foreground"
+                                    asChild
+                                >
+                                    <Link to="/login">Login</Link>
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    className="rounded-full text-xs font-medium px-4 h-8 bg-primary hover:bg-primary/90 text-primary-foreground"
+                                    asChild
+                                >
+                                    <Link to="/register">Coba Gratis</Link>
+                                </Button>
+                            </>
+                        )}
                     </div>
 
                     {/* ── Mobile Toggle ── */}
@@ -301,19 +335,48 @@ function Navbar() {
 
                     {/* CTAs */}
                     <div className="pt-3 mt-2 border-t border-border/50 space-y-2">
-                        <Button
-                            variant="outline"
-                            className="w-full rounded-full text-sm justify-center border-border/50"
-                            asChild
-                        >
-                            <Link to="/login" onClick={() => setMobileOpen(false)}>Login</Link>
-                        </Button>
-                        <Button
-                            className="w-full rounded-full text-sm justify-center bg-[oklch(0.58_0.2_18)] hover:bg-[oklch(0.52_0.2_18)] text-white"
-                            asChild
-                        >
-                            <Link to="/register" onClick={() => setMobileOpen(false)}>Coba Gratis</Link>
-                        </Button>
+                        {!authLoading && isAuthenticated ? (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    className="w-full rounded-full text-sm justify-center border-border/50"
+                                    asChild
+                                >
+                                    <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
+                                        <LayoutDashboard className="h-3.5 w-3.5 mr-1.5" />
+                                        Dashboard
+                                    </Link>
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    className="w-full rounded-full text-sm justify-center text-muted-foreground"
+                                    onClick={async () => {
+                                        setMobileOpen(false)
+                                        await signOut()
+                                        navigate('/')
+                                    }}
+                                >
+                                    <LogOut className="h-3.5 w-3.5 mr-1.5" />
+                                    Sign Out
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    className="w-full rounded-full text-sm justify-center border-border/50"
+                                    asChild
+                                >
+                                    <Link to="/login" onClick={() => setMobileOpen(false)}>Login</Link>
+                                </Button>
+                                <Button
+                                    className="w-full rounded-full text-sm justify-center bg-primary hover:bg-primary/90 text-primary-foreground"
+                                    asChild
+                                >
+                                    <Link to="/register" onClick={() => setMobileOpen(false)}>Coba Gratis</Link>
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
