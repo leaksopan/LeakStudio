@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
         return () => subscription.unsubscribe();
     }, [queryClient]);
 
-    // 2. Fetch User Data with React Query
+    // 2. Fetch User Data with React Query (single RPC call)
     const {
         data: userData,
         isLoading: isLoadingData,
@@ -46,82 +46,43 @@ export function AuthProvider({ children }) {
         queryKey: ['userData', user?.id],
         queryFn: async () => {
             if (!user) return null;
-            const controller = new AbortController();
 
-            // A. Get profile with role
-            const { data: profileData, error: profileErr } = await supabase
-                .from('m_user_profiles')
-                .select(`
-                    *,
-                    m_roles:role_id (id, name, description, is_system)
-                `)
-                .eq('id', user.id)
-                .single()
-                .abortSignal(controller.signal);
+            // Single RPC call replaces 5 sequential queries
+            const { data, error } = await supabase
+                .rpc('get_user_context', { p_user_id: user.id });
 
-            if (profileErr) {
+            if (error) {
                 // If profile missing, return null (don't throw to avoid retry loops)
-                if (profileErr.code === 'PGRST116') return null;
-                throw profileErr;
+                if (error.code === 'PGRST116') return null;
+                throw error;
             }
 
-            const role = profileData?.m_roles || null;
+            if (!data) return null;
+
+            const role = data.role || null;
             const isSuperOrMaster = ['superadmin', 'master'].includes(role?.name);
-            let tenant = null;
-            let appAccess = [];
-            let moduleAccess = [];
-            let unitBisnis = [];
 
-            // B. Get Tenant (if exists)
-            if (profileData?.tenant_id) {
-                const { data: tenantData } = await supabase
-                    .from('m_tenants')
-                    .select('id, name, slug, plan, status')
-                    .eq('id', profileData.tenant_id)
-                    .single()
-                    .abortSignal(controller.signal);
-                tenant = tenantData;
-            }
+            // For superadmin/master, fetch all active apps & modules
+            // (these are global lookups, not user-specific)
+            let appAccess = data.app_access || [];
+            let moduleAccess = (data.module_access || []).map(m => m.code).filter(Boolean);
+            let unitBisnis = data.unit_bisnis_ids || [];
 
-            // C. Get App Access
             if (isSuperOrMaster) {
-                const { data: allApps } = await supabase
-                    .from('m_app_registry').select('id').eq('is_active', true).abortSignal(controller.signal);
+                const [{ data: allApps }, { data: allModules }, { data: allUB }] = await Promise.all([
+                    supabase.from('m_app_registry').select('id').eq('is_active', true),
+                    supabase.from('m_app_modules').select('code').eq('is_active', true),
+                    supabase.from('m_unit_bisnis').select('id'),
+                ]);
                 appAccess = allApps?.map(a => a.id) || [];
-            } else {
-                const { data: appData } = await supabase
-                    .from('m_user_app_access').select('app_id').eq('user_id', user.id).abortSignal(controller.signal);
-                appAccess = appData?.map(a => a.app_id) || [];
-            }
-
-            // D. Get Module Access
-            if (isSuperOrMaster) {
-                const { data: allModules } = await supabase
-                    .from('m_app_modules').select('code').eq('is_active', true).abortSignal(controller.signal);
                 moduleAccess = allModules?.map(m => m.code) || [];
-            } else {
-                const { data: modData } = await supabase
-                    .from('m_user_module_access')
-                    .select('m_app_modules:module_id(code)')
-                    .eq('user_id', user.id)
-                    .abortSignal(controller.signal);
-                moduleAccess = modData?.map(m => m.m_app_modules?.code).filter(Boolean) || [];
-            }
-
-            // E. Get Unit Bisnis Access
-            if (isSuperOrMaster) {
-                const { data: allUB } = await supabase.from('m_unit_bisnis').select('id').abortSignal(controller.signal);
                 unitBisnis = allUB?.map(u => u.id) || [];
-            } else {
-                const { data: ubData } = await supabase
-                    .from('m_user_unit_bisnis').select('unit_bisnis_id').eq('user_id', user.id).abortSignal(controller.signal);
-                unitBisnis = ubData?.map(u => u.unit_bisnis_id) || [];
             }
 
             return {
-                profile: profileData,
+                profile: data.profile,
                 role,
-                tenant,
+                tenant: data.tenant,
                 appAccess,
                 moduleAccess,
                 unitBisnis

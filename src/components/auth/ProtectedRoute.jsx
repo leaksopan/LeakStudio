@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 export default function ProtectedRoute({ children, permission }) {
-    const { isAuthenticated, loading, hasPermission } = useAuth();
+    const { isAuthenticated, loading, hasModuleAccess } = useAuth();
     const location = useLocation();
 
     if (loading) {
@@ -18,8 +18,8 @@ export default function ProtectedRoute({ children, permission }) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Optional: check specific permission
-    if (permission && !hasPermission(permission)) {
+    // Optional: check specific module permission
+    if (permission && !hasModuleAccess(permission)) {
         return (
             <div className="flex h-screen w-full items-center justify-center bg-background">
                 <div className="text-center space-y-2">

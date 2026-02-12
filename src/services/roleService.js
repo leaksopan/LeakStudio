@@ -8,6 +8,7 @@ export const roleService = {
         const { data, error } = await supabase
             .from('m_roles')
             .select('*')
+            .is('deleted_at', null)
             .order('created_at', { ascending: true });
         if (error) throw error;
         return data;
@@ -18,6 +19,7 @@ export const roleService = {
             .from('m_roles')
             .select('*')
             .eq('id', id)
+            .is('deleted_at', null)
             .single();
         if (error) throw error;
         return data;
@@ -47,7 +49,7 @@ export const roleService = {
     async delete(id) {
         const { error } = await supabase
             .from('m_roles')
-            .delete()
+            .update({ deleted_at: new Date().toISOString() })
             .eq('id', id);
         if (error) throw error;
     },
@@ -68,6 +70,7 @@ export const moduleService = {
                     name
                 )
             `)
+            .is('deleted_at', null)
             .order('code', { ascending: true });
         if (error) throw error;
         return data;
@@ -78,6 +81,7 @@ export const moduleService = {
             .from('m_app_modules')
             .select('*')
             .eq('app_id', appId)
+            .is('deleted_at', null)
             .order('name', { ascending: true });
         if (error) throw error;
         return data;
@@ -107,7 +111,7 @@ export const moduleService = {
     async delete(id) {
         const { error } = await supabase
             .from('m_app_modules')
-            .delete()
+            .update({ deleted_at: new Date().toISOString() })
             .eq('id', id);
         if (error) throw error;
     },
@@ -137,13 +141,13 @@ export const userAccessService = {
         const { data, error } = await supabase
             .from('m_user_profiles')
             .select(`
-                *,
-                m_roles:role_id (
-                    id,
-                    name,
-                    description
-                )
-            `)
+            *,
+            m_roles: role_id (
+                id,
+                name,
+                description
+            )
+                `)
             .order('created_at', { ascending: true });
         if (error) throw error;
         return data;
