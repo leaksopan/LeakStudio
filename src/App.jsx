@@ -4,22 +4,22 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminRoute from '@/components/auth/AdminRoute';
-import LandingPage from '@/pages/landing/LandingPage';
-import Login from '@/pages/auth/Login';
-import Register from '@/pages/auth/Register';
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import TenantLayout from '@/components/layout/TenantLayout';
-import Dashboard from '@/pages/dashboard/Dashboard';
-import TenantList from '@/pages/dashboard/TenantList';
-import RoleList from '@/pages/dashboard/master/RoleList';
-import ModuleList from '@/pages/dashboard/master/ModuleList';
-import UserAccessConfig from '@/pages/dashboard/master/UserAccessConfig';
 import { Toaster } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Lazy-loaded POS modules (code splitting)
+// Lazy-loaded route modules to keep the entry bundle small.
+const LandingPage = lazy(() => import('@/pages/landing/LandingPage'));
+const Login = lazy(() => import('@/pages/auth/Login'));
+const Register = lazy(() => import('@/pages/auth/Register'));
+const DashboardLayout = lazy(() => import('@/components/layout/DashboardLayout'));
+const TenantLayout = lazy(() => import('@/components/layout/TenantLayout'));
+const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
+const TenantList = lazy(() => import('@/pages/dashboard/TenantList'));
+const RoleList = lazy(() => import('@/pages/dashboard/master/RoleList'));
+const ModuleList = lazy(() => import('@/pages/dashboard/master/ModuleList'));
+const UserAccessConfig = lazy(() => import('@/pages/dashboard/master/UserAccessConfig'));
 const POSDashboard = lazy(() => import('@/pages/apps/pos/dashboard'));
 const Kasir = lazy(() => import('@/pages/apps/pos/kasir'));
 const Stok = lazy(() => import('@/pages/apps/pos/stok'));

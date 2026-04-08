@@ -11,4 +11,44 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          const moduleId = id.split(path.sep).join('/')
+
+          if (!moduleId.includes('node_modules')) return
+
+          if (moduleId.includes('/react-router-dom/') || moduleId.includes('/react-router/')) {
+            return 'router-vendor'
+          }
+
+          if (moduleId.includes('/react-dom/') || moduleId.includes('/react/') || moduleId.includes('/scheduler/')) {
+            return 'react-vendor'
+          }
+
+          if (moduleId.includes('/@supabase/')) {
+            return 'supabase-vendor'
+          }
+
+          if (moduleId.includes('/@tanstack/')) {
+            return 'query-vendor'
+          }
+
+          if (moduleId.includes('/framer-motion/') || moduleId.includes('/motion-dom/')) {
+            return 'motion-vendor'
+          }
+
+          if (
+            moduleId.includes('/@radix-ui/') ||
+            moduleId.includes('/radix-ui/') ||
+            moduleId.includes('/lucide-react/') ||
+            moduleId.includes('/sonner/')
+          ) {
+            return 'ui-vendor'
+          }
+        },
+      },
+    },
+  },
 })
