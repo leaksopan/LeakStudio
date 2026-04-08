@@ -8,7 +8,7 @@ export default function DashboardLayout() {
     return (
         <div className="flex h-screen w-full overflow-hidden bg-background">
             <Sidebar />
-            <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex flex-1 flex-col overflow-hidden pl-16 transition-all duration-300 ease-in-out">
                 {/* Top bar with user info */}
                 <header className="flex h-14 items-center justify-end border-b bg-card px-6">
                     <div className="flex items-center gap-3">

@@ -46,6 +46,7 @@ export const warehouseService = {
 
     // --- UOMs ---
     async getUOMs() {
+        // RLS already filters by tenant via auth.uid() → m_user_profiles.tenant_id
         const { data, error } = await supabase
             .from('m_uoms')
             .select('*')
@@ -53,6 +54,45 @@ export const warehouseService = {
             .order('name', { ascending: true });
         if (error) throw error;
         return data;
+    },
+
+    async createUOM({ name, code }) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
+
+        const { data: profile } = await supabase
+            .from('m_user_profiles')
+            .select('tenant_id')
+            .eq('id', user.id)
+            .single();
+        if (!profile?.tenant_id) throw new Error('User has no tenant assigned');
+
+        const { data, error } = await supabase
+            .from('m_uoms')
+            .insert([{ name, code, tenant_id: profile.tenant_id }])
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    },
+
+    async updateUOM(id, { name, code }) {
+        const { data, error } = await supabase
+            .from('m_uoms')
+            .update({ name, code })
+            .eq('id', id)
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    },
+
+    async deleteUOM(id) {
+        const { error } = await supabase
+            .from('m_uoms')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('id', id);
+        if (error) throw error;
     },
 
     // --- Suppliers ---

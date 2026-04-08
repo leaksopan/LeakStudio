@@ -7,6 +7,7 @@ import { resolveIcon } from '@/lib/iconMap';
 import {
     Layers, LogOut, Store, LayoutDashboard, Loader2
 } from 'lucide-react';
+import { useState } from 'react';
 
 /* ─────────────── Wrapper with Provider ─────────────── */
 export default function TenantLayout() {
@@ -23,6 +24,7 @@ function TenantLayoutInner() {
     const { profile, signOut } = useAuth();
     const { tenantSlug, appSlug } = useParams();
     const location = useLocation();
+    const [isHovered, setIsHovered] = useState(false);
 
     if (loading) {
         return (
@@ -48,18 +50,33 @@ function TenantLayoutInner() {
     return (
         <div className="flex h-screen w-full overflow-hidden bg-background">
             {/* ── Sidebar ── */}
-            <div className="flex h-full w-64 flex-col border-r bg-card">
+            <div
+                className={cn(
+                    "fixed left-0 top-0 z-40 flex h-screen flex-col border-r bg-card transition-all duration-300 ease-in-out",
+                    isHovered ? "w-64 shadow-xl" : "w-16"
+                )}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
                 {/* Brand */}
-                <div className="flex h-14 items-center border-b px-6">
-                    <div className="flex items-center gap-2">
-                        <Layers className="h-5 w-5 text-primary" />
-                        <span className="font-bold text-sm truncate">{tenant.name}</span>
+                <div className="flex h-14 items-center border-b px-4 overflow-hidden whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                        <Layers className="h-6 w-6 shrink-0 text-primary" />
+                        <span className={cn(
+                            "font-bold text-sm truncate transition-opacity duration-300",
+                            isHovered ? "opacity-100" : "opacity-0 hidden"
+                        )}>
+                            {tenant.name}
+                        </span>
                     </div>
                 </div>
 
                 {/* App switcher */}
-                <div className="border-b px-4 py-3">
-                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <div className="border-b px-2 py-3">
+                    <p className={cn(
+                        "text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2 transition-opacity duration-300",
+                        isHovered ? "opacity-100" : "opacity-0 hidden"
+                    )}>
                         Aplikasi
                     </p>
                     <div className="grid gap-1">
@@ -71,14 +88,21 @@ function TenantLayoutInner() {
                                     key={app.id}
                                     to={`/t/${tenantSlug}/${app.slug}/dashboard`}
                                     className={cn(
-                                        "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all hover:text-primary",
+                                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-primary",
                                         isActive
                                             ? "bg-primary/10 text-primary font-medium"
-                                            : "text-muted-foreground"
+                                            : "text-muted-foreground",
+                                        !isHovered && "justify-center px-0"
                                     )}
+                                    title={!isHovered ? app.name : undefined}
                                 >
-                                    <Icon className="h-4 w-4" />
-                                    {app.name}
+                                    <Icon className="h-5 w-5 shrink-0" />
+                                    <span className={cn(
+                                        "whitespace-nowrap transition-all duration-300",
+                                        isHovered ? "opacity-100 w-auto" : "opacity-0 w-0 hidden"
+                                    )}>
+                                        {app.name}
+                                    </span>
                                 </Link>
                             );
                         })}
@@ -86,10 +110,13 @@ function TenantLayoutInner() {
                 </div>
 
                 {/* Sub-navigation for active app */}
-                <div className="flex-1 overflow-auto py-4">
-                    <nav className="grid items-start px-4 text-sm font-medium gap-0.5">
+                <div className="flex-1 overflow-x-hidden overflow-y-auto py-4">
+                    <nav className="grid items-start px-2 text-sm font-medium gap-1">
                         {modules.length === 0 ? (
-                            <div className="px-4 text-xs text-muted-foreground text-center py-4">
+                            <div className={cn(
+                                "text-xs text-muted-foreground text-center py-4 px-2",
+                                !isHovered && "hidden"
+                            )}>
                                 Tidak ada modul tersedia
                             </div>
                         ) : (
@@ -112,11 +139,18 @@ function TenantLayoutInner() {
                                             "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
                                             isActive
                                                 ? "bg-muted text-primary"
-                                                : "text-muted-foreground"
+                                                : "text-muted-foreground",
+                                            !isHovered && "justify-center px-0"
                                         )}
+                                        title={!isHovered ? module.name : undefined}
                                     >
-                                        <Icon className="h-4 w-4" />
-                                        {module.name}
+                                        <Icon className="h-5 w-5 shrink-0" />
+                                        <span className={cn(
+                                            "whitespace-nowrap transition-all duration-300",
+                                            isHovered ? "opacity-100 w-auto" : "opacity-0 w-0 hidden"
+                                        )}>
+                                            {module.name}
+                                        </span>
                                     </Link>
                                 );
                             })
@@ -125,20 +159,29 @@ function TenantLayoutInner() {
                 </div>
 
                 {/* Logout */}
-                <div className="border-t p-4">
+                <div className="border-t p-2">
                     <Button
                         variant="ghost"
-                        className="w-full justify-start gap-2 text-muted-foreground hover:text-primary"
+                        className={cn(
+                            "w-full gap-3 text-muted-foreground hover:text-primary",
+                            !isHovered ? "justify-center px-0" : "justify-start px-3"
+                        )}
                         onClick={signOut}
+                        title={!isHovered ? "Logout" : undefined}
                     >
-                        <LogOut className="h-4 w-4" />
-                        Logout
+                        <LogOut className="h-5 w-5 shrink-0" />
+                        <span className={cn(
+                            "whitespace-nowrap transition-all duration-300",
+                            isHovered ? "opacity-100 w-auto" : "opacity-0 w-0 hidden"
+                        )}>
+                            Logout
+                        </span>
                     </Button>
                 </div>
             </div>
 
             {/* ── Main content ── */}
-            <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex flex-1 flex-col overflow-hidden pl-16 transition-all duration-300 ease-in-out">
                 <header className="flex h-14 items-center justify-between border-b bg-card px-6">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span className="font-medium text-foreground capitalize">{appSlug}</span>

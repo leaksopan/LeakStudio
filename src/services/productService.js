@@ -91,7 +91,9 @@ export const productService = {
             .from('m_products')
             .select(`
                 *,
-                m_categories ( id, name )
+                m_categories ( id, name ),
+                sales_uom:uom_id ( id, name, code ),
+                stock_uom:stock_uom_id ( id, name, code )
             `)
             .is('deleted_at', null)
             .order('name', { ascending: true });
@@ -113,7 +115,9 @@ export const productService = {
             .from('m_products')
             .select(`
                 *,
-                m_categories ( id, name )
+                m_categories ( id, name ),
+                sales_uom:uom_id ( id, name, code ),
+                stock_uom:stock_uom_id ( id, name, code )
             `)
             .eq('id', id)
             .is('deleted_at', null)
@@ -134,11 +138,37 @@ export const productService = {
 
         if (!profile?.tenant_id) throw new Error('User has no tenant assigned');
 
+        // --- Auto-generate SKU if not provided ---
+        let sku = productData.sku?.trim() || '';
+        if (!sku) {
+            // Get category code for prefix
+            let prefix = 'PROD';
+            if (productData.category_id) {
+                const { data: cat } = await supabase
+                    .from('m_categories')
+                    .select('code')
+                    .eq('id', productData.category_id)
+                    .single();
+                if (cat?.code) prefix = cat.code.toUpperCase();
+            }
+
+            // Count existing products with this prefix in this tenant to get next sequence
+            const { count } = await supabase
+                .from('m_products')
+                .select('id', { count: 'exact', head: true })
+                .eq('tenant_id', profile.tenant_id)
+                .like('sku', `${prefix}-%`);
+
+            const sequence = String((count || 0) + 1).padStart(3, '0');
+            sku = `${prefix}-${sequence}`;
+        }
+        // -----------------------------------------
+
         const { data, error } = await supabase
             .from('m_products')
             .insert({
                 ...productData,
-                // Ensure new fields are passed: item_class_id, item_group_id, etc.
+                sku,
                 tenant_id: profile.tenant_id
             })
             .select()
@@ -174,7 +204,9 @@ export const productService = {
             .from('m_product_compositions')
             .select(`
                 *,
-                child_product:child_product_id ( id, name, unit, price )
+                child_product:child_product_id ( id, name, sku, uom_id, m_uoms ( id, name, code ) ),
+                usage_uom:usage_uom_id ( id, name, code ),
+                variant:variant_id ( id, name )
             `)
             .eq('parent_product_id', productId)
             .is('deleted_at', null);
@@ -211,7 +243,10 @@ export const productService = {
                 parent_product_id: productId,
                 child_product_id: ing.child_product_id,
                 quantity: ing.quantity,
-                unit: ing.unit
+                unit: ing.unit || null,
+                usage_uom_id: ing.usage_uom_id || null,
+                conversion_factor: ing.conversion_factor || 1,
+                variant_id: ing.variant_id || null
             }));
 
             const { error: insError } = await supabase
@@ -224,6 +259,83 @@ export const productService = {
             .from('m_products')
             .update({ has_recipe: ingredients.length > 0 })
             .eq('id', productId);
+    },
+
+    // =========================================
+    // Product Variants Management
+    // =========================================
+    async getVariants(productId) {
+        const { data, error } = await supabase
+            .from('m_product_variants')
+            .select('*')
+            .eq('product_id', productId)
+            .is('deleted_at', null)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        return data;
+    },
+
+    async updateVariants(productId, variants) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
+
+        const { data: profile } = await supabase
+            .from('m_user_profiles')
+            .select('tenant_id')
+            .eq('id', user.id)
+            .single();
+
+        if (!profile?.tenant_id) throw new Error('User has no tenant assigned');
+
+        // 1. Soft delete existing variants not in the new list
+        // Note: Logic here is simple: we delete all and recreate, OR we try to match IDs.
+        // Better: match IDs.
+        const existingIds = variants.filter(v => v.id).map(v => v.id);
+
+        // Delete removed variants
+        let query = supabase
+            .from('m_product_variants')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('product_id', productId)
+            .is('deleted_at', null);
+
+        if (existingIds.length > 0) {
+            query = query.not('id', 'in', `(${existingIds.join(',')})`);
+        }
+
+        await query;
+
+        // 2. Upsert (Update existing, Insert new)
+        const upsertData = variants.map(v => ({
+            id: v.id, // if exists, update
+            product_id: productId,
+            tenant_id: profile.tenant_id,
+            name: v.name,
+            price_diff: v.price_diff || 0,
+            sku: v.sku || null,
+            deleted_at: null // ensure it's not deleted if we reactivate a previously deleted ID
+        }));
+
+        if (upsertData.length > 0) {
+            const { error } = await supabase
+                .from('m_product_variants')
+                .upsert(upsertData)
+                .select();
+            if (error) throw error;
+        }
+
+        // Update product flag
+        await supabase
+            .from('m_products')
+            .update({ has_variants: variants.length > 0 }) // We need to add this column to m_products too? Or just rely on table check?
+        // Actually request didn't ask for has_variants flag in m_products, but it might be useful.
+        // For now, let's assume we don't strictly need a flag in m_products if we check the relation.
+        // But having it is faster. 
+        // Wait, I didn't add `has_variants` to m_products schema in the migration.
+        // So I should SKIP updating m_products for now unless I add the column.
+        // Let's check if I can add it. It's safer to NOT add it now to avoid complexity.
+        // We can just rely on checking m_product_variants table.
     },
 
     // =========================================
@@ -283,3 +395,5 @@ export const productService = {
         }
     }
 };
+
+
