@@ -1,6 +1,6 @@
-import { supabase } from '../lib/supabase';
-import { inventoryService } from './inventoryService';
-import { inventoryService } from './inventoryService';
+import { supabase } from '../lib/supabase.js';
+import { inventoryService } from './inventoryService.js';
+import { inventoryService } from './inventoryService.js';
 
 export const transactionService = {
     /**

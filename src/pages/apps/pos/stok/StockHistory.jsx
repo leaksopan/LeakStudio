@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.jsx';
 
 export default function StockHistory() {
     return (

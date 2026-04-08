@@ -5,19 +5,19 @@ import {
     moduleService,
     unitBisnisService,
     roleService,
-} from '@/services/roleService';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+} from '@/services/roleService.js';
+import { useAuth } from '@/contexts/AuthContext.jsx';
+import { Button } from '@/components/ui/button.jsx';
+import { Checkbox } from '@/components/ui/checkbox.jsx';
+import { Label } from '@/components/ui/label.jsx';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+} from '@/components/ui/select.jsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { toast } from 'sonner';
 import { Users, Loader2, Save } from 'lucide-react';
 

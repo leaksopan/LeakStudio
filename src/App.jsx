@@ -1,32 +1,32 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import AdminRoute from '@/components/auth/AdminRoute';
+import { AuthProvider } from '@/contexts/AuthContext.jsx';
+import { ErrorBoundary } from '@/components/ErrorBoundary.jsx';
+import ProtectedRoute from '@/components/auth/ProtectedRoute.jsx';
+import AdminRoute from '@/components/auth/AdminRoute.jsx';
 import { Toaster } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Lazy-loaded route modules to keep the entry bundle small.
-const LandingPage = lazy(() => import('@/pages/landing/LandingPage'));
-const Login = lazy(() => import('@/pages/auth/Login'));
-const Register = lazy(() => import('@/pages/auth/Register'));
-const DashboardLayout = lazy(() => import('@/components/layout/DashboardLayout'));
-const TenantLayout = lazy(() => import('@/components/layout/TenantLayout'));
-const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
-const TenantList = lazy(() => import('@/pages/dashboard/TenantList'));
-const RoleList = lazy(() => import('@/pages/dashboard/master/RoleList'));
-const ModuleList = lazy(() => import('@/pages/dashboard/master/ModuleList'));
-const UserAccessConfig = lazy(() => import('@/pages/dashboard/master/UserAccessConfig'));
-const POSDashboard = lazy(() => import('@/pages/apps/pos/dashboard'));
-const Kasir = lazy(() => import('@/pages/apps/pos/kasir'));
-const Stok = lazy(() => import('@/pages/apps/pos/stok'));
-const Laporan = lazy(() => import('@/pages/apps/pos/laporan'));
-const Produk = lazy(() => import('@/pages/apps/pos/produk'));
-const UserList = lazy(() => import('@/pages/apps/pos/user'));
-const Pengaturan = lazy(() => import('@/pages/apps/pos/pengaturan'));
+const LandingPage = lazy(() => import('@/pages/landing/LandingPage.jsx'));
+const Login = lazy(() => import('@/pages/auth/Login.jsx'));
+const Register = lazy(() => import('@/pages/auth/Register.jsx'));
+const DashboardLayout = lazy(() => import('@/components/layout/DashboardLayout.jsx'));
+const TenantLayout = lazy(() => import('@/components/layout/TenantLayout.jsx'));
+const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard.jsx'));
+const TenantList = lazy(() => import('@/pages/dashboard/TenantList.jsx'));
+const RoleList = lazy(() => import('@/pages/dashboard/master/RoleList.jsx'));
+const ModuleList = lazy(() => import('@/pages/dashboard/master/ModuleList.jsx'));
+const UserAccessConfig = lazy(() => import('@/pages/dashboard/master/UserAccessConfig.jsx'));
+const POSDashboard = lazy(() => import('@/pages/apps/pos/dashboard/index.jsx'));
+const Kasir = lazy(() => import('@/pages/apps/pos/kasir/index.jsx'));
+const Stok = lazy(() => import('@/pages/apps/pos/stok/index.jsx'));
+const Laporan = lazy(() => import('@/pages/apps/pos/laporan/index.jsx'));
+const Produk = lazy(() => import('@/pages/apps/pos/produk/index.jsx'));
+const UserList = lazy(() => import('@/pages/apps/pos/user/index.jsx'));
+const Pengaturan = lazy(() => import('@/pages/apps/pos/pengaturan/index.jsx'));
 
 const LazyFallback = () => (
   <div className="flex h-full w-full items-center justify-center p-8">

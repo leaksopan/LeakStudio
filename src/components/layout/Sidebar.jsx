@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { cn } from '@/lib/utils.js';
+import { Button } from '@/components/ui/button.jsx';
 import {
     LayoutDashboard,
     Users,

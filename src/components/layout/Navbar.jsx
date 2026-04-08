@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContext'
-import { Button } from '@/components/ui/button'
+import { useAuth } from '../../contexts/AuthContext.jsx'
+import { Button } from '@/components/ui/button.jsx'
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -10,7 +10,7 @@ import {
     NavigationMenuList,
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
+} from '@/components/ui/navigation-menu.jsx'
 import {
     Menu, X, ChevronDown, ChevronRight,
     ShoppingCart, Camera, Layers,

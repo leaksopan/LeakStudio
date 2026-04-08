@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase'; // logic might be in service, but we stick to pattern
-import { inventoryService } from '@/services/inventoryService';
-import { useTenant } from '@/contexts/TenantContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea'; // Need to check if exists, else Input
+import { supabase } from '@/lib/supabase.js'; // logic might be in service, but we stick to pattern
+import { inventoryService } from '@/services/inventoryService.js';
+import { useTenant } from '@/contexts/TenantContext.jsx';
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
+import { Label } from '@/components/ui/label.jsx';
+import { Textarea } from '@/components/ui/textarea.jsx'; // Need to check if exists, else Input
 import {
     Table,
     TableBody,
@@ -13,7 +13,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table.jsx";
 import {
     Dialog,
     DialogContent,
@@ -22,16 +22,16 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog.jsx";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select.jsx";
 import { Plus, History, Loader2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast.jsx';
 
 export default function StockOpname() {
     const { tenant } = useTenant();

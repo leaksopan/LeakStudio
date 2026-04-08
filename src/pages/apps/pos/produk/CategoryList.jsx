@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { categoryService } from '@/services/productService';
-import { useTenant } from '@/contexts/TenantContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { categoryService } from '@/services/productService.js';
+import { useTenant } from '@/contexts/TenantContext.jsx';
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import {
     Table,
     TableBody,
@@ -10,7 +10,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table.jsx";
 import {
     Dialog,
     DialogContent,
@@ -18,9 +18,9 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog.jsx";
 import { Plus, Pencil, Trash2, Loader2, Search } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast.jsx';
 
 export default function CategoryList() {
     const { tenant } = useTenant();

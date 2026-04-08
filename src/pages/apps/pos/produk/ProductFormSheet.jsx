@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { productService, categoryService } from '@/services/productService';
-import { warehouseService } from '@/services/warehouseService';
-import { useTenant } from '@/contexts/TenantContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { CurrencyInput } from '@/components/ui/currency-input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { productService, categoryService } from '@/services/productService.js';
+import { warehouseService } from '@/services/warehouseService.js';
+import { useTenant } from '@/contexts/TenantContext.jsx';
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
+import { CurrencyInput } from '@/components/ui/currency-input.jsx';
+import { Label } from '@/components/ui/label.jsx';
+import { Switch } from '@/components/ui/switch.jsx';
 import {
     Sheet,
     SheetContent,
@@ -14,14 +14,14 @@ import {
     SheetHeader,
     SheetTitle,
     SheetFooter,
-} from '@/components/ui/sheet';
+} from '@/components/ui/sheet.jsx';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select.jsx";
 import {
     Table,
     TableBody,
@@ -29,10 +29,10 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table.jsx";
 import { Loader2, Plus, Trash2, ChefHat, Calculator, ArrowRight } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { formatCurrency } from '@/lib/utils';
+import { useToast } from '@/components/ui/use-toast.jsx';
+import { formatCurrency } from '@/lib/utils.js';
 
 export default function ProductFormSheet({
     isOpen, onClose, onSaved, product = null,

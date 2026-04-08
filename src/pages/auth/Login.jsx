@@ -3,10 +3,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { authService } from '../../services/authService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { authService } from '../../services/authService.js';
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import {
     Form,
     FormControl,
@@ -14,8 +14,8 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from '@/components/ui/form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+} from '@/components/ui/form.jsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({

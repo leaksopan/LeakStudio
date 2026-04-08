@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
-import { Sidebar } from './Sidebar';
-import { useAuth } from '../../contexts/AuthContext';
+import { Sidebar } from './Sidebar.jsx';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 
 export default function DashboardLayout() {
     const { profile, role } = useAuth();

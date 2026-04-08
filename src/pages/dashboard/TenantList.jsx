@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { tenantService } from '../../services/tenantService';
+import { tenantService } from '../../services/tenantService.js';
 import {
     Table,
     TableBody,
@@ -7,7 +7,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table.jsx';
 import {
     Dialog,
     DialogContent,
@@ -16,18 +16,18 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog.jsx';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui/select.jsx';
+import { Checkbox } from '@/components/ui/checkbox.jsx';
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
+import { Label } from '@/components/ui/label.jsx';
 import { Plus, Loader2, Eye, Store, Camera, ListOrdered } from 'lucide-react';
 import { toast } from 'sonner';
 

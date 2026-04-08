@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { productService, categoryService } from '@/services/productService';
-import { warehouseService } from '@/services/warehouseService';
-import { formatCurrency } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { productService, categoryService } from '@/services/productService.js';
+import { warehouseService } from '@/services/warehouseService.js';
+import { formatCurrency } from '@/lib/utils.js';
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import {
     Table,
     TableBody,
@@ -11,10 +11,10 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table.jsx";
 import { Plus, Pencil, Trash2, Loader2, Search } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import ProductFormSheet from './ProductFormSheet';
+import { useToast } from '@/components/ui/use-toast.jsx';
+import ProductFormSheet from './ProductFormSheet.jsx';
 
 export default function ProductList() {
     const { toast } = useToast();

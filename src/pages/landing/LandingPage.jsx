@@ -8,11 +8,11 @@ import {
     Store, UtensilsCrossed, Briefcase, ImageIcon,
     DollarSign, Package, FileText,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
+import { Button } from '@/components/ui/button.jsx'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx'
+import { Badge } from '@/components/ui/badge.jsx'
+import Navbar from '@/components/layout/Navbar.jsx'
+import Footer from '@/components/layout/Footer.jsx'
 
 /* ─────────────────────────── helpers ──────────────────────────── */
 

@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { tenantService } from '../services/tenantService';
-import { useAuth } from './AuthContext';
+import { tenantService } from '../services/tenantService.js';
+import { useAuth } from './AuthContext.jsx';
 
 const TenantContext = createContext(null);
 

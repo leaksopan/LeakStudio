@@ -1,11 +1,11 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import SubModuleLayout from '@/components/layout/SubModuleLayout';
+import SubModuleLayout from '@/components/layout/SubModuleLayout.jsx';
 import { Package, Tags, Scale } from 'lucide-react';
 
 // Sub-pages (Will create these next/placeholder for now)
-import ProductList from './ProductList';
-import CategoryList from './CategoryList';
-import UnitList from './UnitList';
+import ProductList from './ProductList.jsx';
+import CategoryList from './CategoryList.jsx';
+import UnitList from './UnitList.jsx';
 
 const NAVIGATION_ITEMS = [
     {

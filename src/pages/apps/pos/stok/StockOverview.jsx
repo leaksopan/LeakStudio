@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useTenant } from '@/contexts/TenantContext'; // Assuming tenant context exists as used before
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { supabase } from '@/lib/supabase.js';
+import { useTenant } from '@/contexts/TenantContext.jsx'; // Assuming tenant context exists as used before
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import {
     Table,
     TableBody,
@@ -10,9 +10,9 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table.jsx";
 import { Download, Loader2, Search } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast.jsx';
 
 export default function StockOverview() {
     const { tenant } = useTenant();

@@ -1,9 +1,9 @@
 import { Outlet, Link, useLocation, useParams, Navigate } from 'react-router-dom';
-import { TenantProvider, useTenant } from '../../contexts/TenantContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { resolveIcon } from '@/lib/iconMap';
+import { TenantProvider, useTenant } from '../../contexts/TenantContext.jsx';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { cn } from '@/lib/utils.js';
+import { Button } from '@/components/ui/button.jsx';
+import { resolveIcon } from '@/lib/iconMap.js';
 import {
     Layers, LogOut, Store, LayoutDashboard, Loader2
 } from 'lucide-react';

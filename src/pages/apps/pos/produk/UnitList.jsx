@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { warehouseService } from '@/services/warehouseService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { warehouseService } from '@/services/warehouseService.js';
+import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import {
     Table,
     TableBody,
@@ -9,7 +9,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table.jsx";
 import {
     Dialog,
     DialogContent,
@@ -17,9 +17,9 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog.jsx";
 import { Plus, Pencil, Trash2, Loader2, Search } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast.jsx';
 
 export default function UnitList() {
     const { toast } = useToast();
