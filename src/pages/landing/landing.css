@@ -1,0 +1,53 @@
+.landing-root {
+  --landing-primary: #dedbc8;
+  --landing-text: #e1e0cc;
+  min-height: 100vh;
+  background: #000;
+  color: var(--landing-text);
+  font-family: 'Almarai', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', sans-serif;
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+.landing-root *,
+.landing-root *::before,
+.landing-root *::after {
+  font-family: inherit;
+  letter-spacing: 0;
+}
+
+.landing-root .font-serif {
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.landing-root a:hover {
+  color: var(--landing-text) !important;
+}
+
+.landing-root .landing-light-button,
+.landing-root .landing-light-button:hover {
+  color: #000 !important;
+}
+
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.42'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+}
+
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.34'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-root *,
+  .landing-root *::before,
+  .landing-root *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

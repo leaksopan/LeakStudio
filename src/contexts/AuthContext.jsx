@@ -125,6 +125,40 @@ export function AuthProvider({ children }) {
         return unitBisnis.includes(ubId);
     };
 
+    const hasInventoryAction = (action) => {
+        if (isMasterOrAbove()) return true;
+        const map = {
+            approve: 'inventory.operations.approve',
+            cancel: 'inventory.operations.cancel',
+            complete: 'inventory.operations.complete',
+            attach_wave: 'inventory.picking.attach',
+            unpack_package: 'inventory.packages.unpack',
+            process_reorder_queue: 'inventory.reorder.process',
+            retry_reorder_queue: 'inventory.reorder.retry',
+            export_reorder_queue: 'inventory.reorder.export',
+            mark_reorder_failed: 'inventory.reorder.mark_failed',
+            requeue_processed: 'inventory.reorder.requeue',
+            approve_rma: 'inventory.rma.approve',
+            reject_rma: 'inventory.rma.reject',
+            view_rma_detail: 'inventory.rma.detail',
+            create_rma: 'inventory.rma.create',
+            cancel_rma: 'inventory.rma.cancel',
+            export_rma: 'inventory.rma.export',
+            create_serializer_rule: 'inventory.serializer.create',
+            generate_serializer_code: 'inventory.serializer.generate',
+            view_serializer_logs: 'inventory.serializer.logs',
+            edit_serializer_rule: 'inventory.serializer.edit',
+            deactivate_serializer_rule: 'inventory.serializer.deactivate',
+            reactivate_serializer_rule: 'inventory.serializer.reactivate',
+            generate_notification_queue: 'inventory.notification.generate',
+            process_notification_queue: 'inventory.notification.process',
+            export_notification_queue: 'inventory.notification.export',
+        };
+        const key = map[action];
+        if (!key) return false;
+        return moduleAccess.includes(key);
+    };
+
     const value = {
         user,
         loading: loadingAuth || (!!user && isLoadingData),
@@ -141,6 +175,7 @@ export function AuthProvider({ children }) {
         hasAppAccess,
         hasModuleAccess,
         hasUnitBisnis,
+        hasInventoryAction,
         signOut,
         refreshUserData: refetch, // Expose refetch capability
     };

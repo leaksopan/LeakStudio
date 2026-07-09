@@ -238,7 +238,7 @@ export const inventoryService = {
             batch_id: transfer.batch_id, // Ideally link to NEW batch id if created, but using source batch ID for trace linkage is acceptable for simple ledger
             type: 'TRANSFER_IN',
             qty: transfer.qty,
-            balance_after: newBalance + transfer.qty,
+            current_balance: newBalance,
             ref_id: transfer.id,
             ref_type: 'transfer',
             doc_url: transfer.evidence_url,

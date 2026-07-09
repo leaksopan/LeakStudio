@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase.js';
 import { inventoryService } from '@/services/inventoryService.js';
+import { inventoryPageService } from '@/services/inventoryPageService.js';
 import { useTenant } from '@/contexts/TenantContext.jsx';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select.jsx";
 import { ArrowRightLeft, Loader2, Plus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast.jsx';
+import { validateStockTransfer } from '@/utils/inventoryValidation.js';
 
 export default function StockMutasi() {
     const { tenant } = useTenant();
@@ -54,6 +55,7 @@ export default function StockMutasi() {
         qty: '',
         evidence_url: ''
     });
+    const [formErrors, setFormErrors] = useState({});
 
     useEffect(() => {
         if (tenant) {
@@ -65,21 +67,8 @@ export default function StockMutasi() {
     const fetchTransfers = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
-                .from('t_stock_transfers')
-                .select(`
-                    *,
-                    m_products ( name ),
-                    t_inventory_batches ( batch_number ),
-                    from_loc:from_location_id ( name ),
-                    to_loc:to_location_id ( name )
-                `)
-                .eq('tenant_id', tenant.id)
-                .order('created_at', { ascending: false })
-                .limit(20);
-
-            if (error) throw error;
-            setTransfers(data || []);
+            const data = await inventoryPageService.getTransferHistory(tenant.id);
+            setTransfers(data);
         } catch (error) {
             console.error('Error fetching transfers:', error);
         } finally {
@@ -88,10 +77,9 @@ export default function StockMutasi() {
     };
 
     const fetchDropdowns = async () => {
-        const { data: prods } = await supabase.from('m_products').select('id, name').eq('tenant_id', tenant.id);
-        const { data: locs } = await supabase.from('m_locations').select('id, name').eq('tenant_id', tenant.id);
-        setProducts(prods || []);
-        setLocations(locs || []);
+        const { products: prods, locations: locs } = await inventoryPageService.getProductsAndLocations(tenant.id);
+        setProducts(prods);
+        setLocations(locs);
     };
 
     const handleProductChange = async (productId) => {
@@ -100,11 +88,7 @@ export default function StockMutasi() {
             setBatches([]);
             return;
         }
-        const { data } = await supabase
-            .from('t_inventory_batches')
-            .select('id, batch_number, quantity, location_id, m_locations(name)')
-            .eq('product_id', productId)
-            .gt('quantity', 0);
+        const data = await inventoryPageService.getBatchesByProduct(productId);
         setBatches(data || []);
     };
 
@@ -122,21 +106,18 @@ export default function StockMutasi() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (formData.from_location_id === formData.to_location_id) {
-            toast({ title: "Error", description: "Lokasi asal dan tujuan tidak boleh sama.", variant: "destructive" });
-            return;
-        }
-
         try {
             setIsSubmitting(true);
-            const transfer = await inventoryService.requestTransfer({
-                product_id: formData.product_id,
-                batch_id: formData.batch_id,
-                from_location_id: formData.from_location_id,
-                to_location_id: formData.to_location_id,
-                qty: parseFloat(formData.qty),
-                evidence_url: formData.evidence_url
-            });
+            const selectedBatch = batches.find((b) => b.id === formData.batch_id) || null;
+            const validation = validateStockTransfer(formData, selectedBatch);
+            if (!validation.valid) {
+                setFormErrors(validation.errors);
+                toast({ title: 'Validasi gagal', description: 'Periksa input mutasi.', variant: 'destructive' });
+                return;
+            }
+            setFormErrors({});
+
+            const transfer = await inventoryService.requestTransfer(validation.payload);
 
             // Auto-approve for now (Simplified flow)
             await inventoryService.approveTransfer(transfer.id);
@@ -144,6 +125,7 @@ export default function StockMutasi() {
             toast({ title: "Sukses", description: "Transfer stok berhasil diproses." });
             setIsOpen(false);
             setFormData({ product_id: '', batch_id: '', from_location_id: '', to_location_id: '', qty: '', evidence_url: '' });
+            setFormErrors({});
             fetchTransfers();
         } catch (error) {
             console.error(error);
@@ -219,7 +201,7 @@ export default function StockMutasi() {
                 </Table>
             </div>
 
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) setFormErrors({}); }}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>Buat Mutasi Stok</DialogTitle>
@@ -234,6 +216,7 @@ export default function StockMutasi() {
                                     {products.map(p => (<SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>))}
                                 </SelectContent>
                             </Select>
+                            {formErrors.product_id && <p className="text-xs text-red-600">{formErrors.product_id}</p>}
                         </div>
                         {formData.product_id && (
                             <div className="space-y-2">
@@ -248,12 +231,14 @@ export default function StockMutasi() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {formErrors.batch_id && <p className="text-xs text-red-600">{formErrors.batch_id}</p>}
                             </div>
                         )}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label>Dari Lokasi</Label>
                                 <Input value={locations.find(l => l.id === formData.from_location_id)?.name || '-'} disabled />
+                                {formErrors.from_location_id && <p className="text-xs text-red-600">{formErrors.from_location_id}</p>}
                             </div>
                             <div className="space-y-2">
                                 <Label>Ke Lokasi</Label>
@@ -265,6 +250,7 @@ export default function StockMutasi() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {formErrors.to_location_id && <p className="text-xs text-red-600">{formErrors.to_location_id}</p>}
                             </div>
                         </div>
                         <div className="space-y-2">
@@ -275,6 +261,7 @@ export default function StockMutasi() {
                                 value={formData.qty}
                                 onChange={e => setFormData(prev => ({ ...prev, qty: e.target.value }))}
                             />
+                            {formErrors.qty && <p className="text-xs text-red-600">{formErrors.qty}</p>}
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Batal</Button>

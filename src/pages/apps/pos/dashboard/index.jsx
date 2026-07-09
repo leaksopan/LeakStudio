@@ -1,8 +1,8 @@
 export default function POSDashboard() {
-    return (
-        <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
-            <h1 className="text-4xl font-bold text-primary">LeakStudio POS</h1>
-            <p className="text-xl text-muted-foreground">Dashboard — Coming Soon</p>
-        </div>
-    );
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
+      <h1 className="text-4xl font-bold text-primary">LeakStudio POS</h1>
+      <p className="text-xl text-muted-foreground">Dashboard POS</p>
+    </div>
+  );
 }

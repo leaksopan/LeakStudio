@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase.js'; // logic might be in service, but we stick to pattern
 import { inventoryService } from '@/services/inventoryService.js';
+import { inventoryPageService } from '@/services/inventoryPageService.js';
 import { useTenant } from '@/contexts/TenantContext.jsx';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select.jsx";
 import { Plus, History, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast.jsx';
+import { validateStockAdjustment } from '@/utils/inventoryValidation.js';
 
 export default function StockOpname() {
     const { tenant } = useTenant();
@@ -55,6 +56,7 @@ export default function StockOpname() {
         reason: '',
         evidence_url: '' // simplified
     });
+    const [formErrors, setFormErrors] = useState({});
 
     useEffect(() => {
         if (tenant) {
@@ -66,19 +68,8 @@ export default function StockOpname() {
     const fetchHistory = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
-                .from('t_stock_adjustments')
-                .select(`
-                    *,
-                    m_products ( name ),
-                    t_inventory_batches ( batch_number )
-                `)
-                .eq('tenant_id', tenant.id)
-                .order('created_at', { ascending: false })
-                .limit(20);
-
-            if (error) throw error;
-            setHistory(data || []);
+            const data = await inventoryPageService.getAdjustmentHistory(tenant.id);
+            setHistory(data);
         } catch (error) {
             console.error('Error fetching history:', error);
         } finally {
@@ -87,11 +78,9 @@ export default function StockOpname() {
     };
 
     const fetchDropdowns = async () => {
-        // Fetch basic data for form
-        const { data: prods } = await supabase.from('m_products').select('id, name').eq('tenant_id', tenant.id);
-        const { data: locs } = await supabase.from('m_locations').select('id, name').eq('tenant_id', tenant.id);
-        setProducts(prods || []);
-        setLocations(locs || []);
+        const { products: prods, locations: locs } = await inventoryPageService.getProductsAndLocations(tenant.id);
+        setProducts(prods);
+        setLocations(locs);
     };
 
     const handleProductChange = async (productId) => {
@@ -101,11 +90,7 @@ export default function StockOpname() {
             setBatches([]);
             return;
         }
-        const { data } = await supabase
-            .from('t_inventory_batches')
-            .select('id, batch_number, quantity, m_locations(name)')
-            .eq('product_id', productId)
-            .gt('quantity', 0); // Only adjust existing batches usually? Or create new batch?
+        const data = await inventoryPageService.getBatchesByProduct(productId);
         // Opname typically adjusts EXISTING batch. New batch is "Inbound/Purchase".
         setBatches(data || []);
     };
@@ -114,18 +99,19 @@ export default function StockOpname() {
         e.preventDefault();
         try {
             setIsSubmitting(true);
-            await inventoryService.adjustStock({
-                product_id: formData.product_id,
-                batch_id: formData.batch_id,
-                location_id: formData.location_id, // Should match batch location or be explicit
-                adjustment_qty: parseFloat(formData.adjustment_qty),
-                reason: formData.reason,
-                evidence_url: formData.evidence_url
-            });
+            const validation = validateStockAdjustment(formData);
+            if (!validation.valid) {
+                setFormErrors(validation.errors);
+                toast({ title: 'Validasi gagal', description: 'Periksa input form terlebih dahulu.', variant: 'destructive' });
+                return;
+            }
+            setFormErrors({});
+            await inventoryService.adjustStock(validation.payload);
 
             toast({ title: "Sukses", description: "Stok berhasil disesuaikan." });
             setIsOpen(false);
             setFormData({ product_id: '', batch_id: '', location_id: '', adjustment_qty: '', reason: '', evidence_url: '' });
+            setFormErrors({});
             fetchHistory();
         } catch (error) {
             console.error(error);
@@ -189,7 +175,7 @@ export default function StockOpname() {
                 </Table>
             </div>
 
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) setFormErrors({}); }}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>Stock Opname Baru</DialogTitle>
@@ -211,6 +197,7 @@ export default function StockOpname() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            {formErrors.product_id && <p className="text-xs text-red-600">{formErrors.product_id}</p>}
                         </div>
 
                         {formData.product_id && (
@@ -238,6 +225,7 @@ export default function StockOpname() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {formErrors.batch_id && <p className="text-xs text-red-600">{formErrors.batch_id}</p>}
                             </div>
                         )}
 
@@ -256,6 +244,7 @@ export default function StockOpname() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            {formErrors.location_id && <p className="text-xs text-red-600">{formErrors.location_id}</p>}
                         </div>
 
                         <div className="space-y-2">
@@ -267,6 +256,7 @@ export default function StockOpname() {
                                 onChange={e => setFormData(prev => ({ ...prev, adjustment_qty: e.target.value }))}
                             />
                             <p className="text-xs text-muted-foreground">Gunakan angka negatif untuk pengurangan.</p>
+                            {formErrors.adjustment_qty && <p className="text-xs text-red-600">{formErrors.adjustment_qty}</p>}
                         </div>
 
                         <div className="space-y-2">
@@ -276,6 +266,7 @@ export default function StockOpname() {
                                 value={formData.reason}
                                 onChange={e => setFormData(prev => ({ ...prev, reason: e.target.value }))}
                             />
+                            {formErrors.reason && <p className="text-xs text-red-600">{formErrors.reason}</p>}
                         </div>
 
                         <DialogFooter>

@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminRoute({ children }) {
-    const { isAuthenticated, loading, role, profile, tenantSlug } = useAuth();
+    const { isAuthenticated, loading, role, tenantSlug } = useAuth();
     const location = useLocation();
 
     if (loading) {

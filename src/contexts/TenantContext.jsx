@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { tenantService } from '../services/tenantService.js';
 import { useAuth } from './AuthContext.jsx';
+import { getDefaultModulesForApp, mergeAppModules } from '@/lib/moduleRegistry.js';
 
 const TenantContext = createContext(null);
 
@@ -63,7 +64,7 @@ export function TenantProvider({ children }) {
 
     // 4. Fetch Modules for Current App
     const {
-        data: modules = [],
+        data: dbModules = [],
         isLoading: modulesLoading,
         refetch: refetchModules
     } = useQuery({
@@ -75,6 +76,15 @@ export function TenantProvider({ children }) {
         },
         enabled: !!currentApp?.id,
         staleTime: 5 * 60 * 1000,
+    });
+
+    const modules = mergeAppModules(
+        dbModules,
+        getDefaultModulesForApp(currentApp?.slug, currentApp?.id)
+    ).filter((module) => {
+        if (!currentApp?.slug) return false;
+        const [prefix] = String(module.code || '').split('.');
+        return prefix === currentApp.slug || !String(module.code || '').includes('.');
     });
 
     const reload = () => {

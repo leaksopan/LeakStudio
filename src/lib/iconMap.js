@@ -28,6 +28,11 @@ import {
     Zap,
     Globe,
     HelpCircle,
+    BookOpen,
+    Wallet,
+    Receipt,
+    Calculator,
+    RefreshCcw,
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -56,6 +61,11 @@ const ICON_MAP = {
     Zap,
     Globe,
     HelpCircle,
+    BookOpen,
+    Wallet,
+    Receipt,
+    Calculator,
+    RefreshCcw,
 };
 
 /**

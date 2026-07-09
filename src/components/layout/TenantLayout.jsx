@@ -1,11 +1,19 @@
-import { Outlet, Link, useLocation, useParams, Navigate } from 'react-router-dom';
+import { Outlet, Link, useLocation, useParams } from 'react-router-dom';
 import { TenantProvider, useTenant } from '../../contexts/TenantContext.jsx';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { cn } from '@/lib/utils.js';
 import { Button } from '@/components/ui/button.jsx';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu.jsx';
 import { resolveIcon } from '@/lib/iconMap.js';
 import {
-    Layers, LogOut, Store, LayoutDashboard, Loader2
+    Check, ChevronsUpDown, Layers, LogOut, Store, Loader2
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -46,6 +54,8 @@ function TenantLayoutInner() {
     }
 
     const basePath = `/t/${tenantSlug}/${appSlug}`;
+    const currentApp = apps.find((app) => app.slug === appSlug);
+    const CurrentAppIcon = resolveIcon(currentApp?.icon, Store);
 
     return (
         <div className="flex h-screen w-full overflow-hidden bg-background">
@@ -183,8 +193,51 @@ function TenantLayoutInner() {
             {/* ── Main content ── */}
             <div className="flex flex-1 flex-col overflow-hidden pl-16 transition-all duration-300 ease-in-out">
                 <header className="flex h-14 items-center justify-between border-b bg-card px-6">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className="font-medium text-foreground capitalize">{appSlug}</span>
+                    <div className="flex min-w-0 items-center gap-3 text-sm text-muted-foreground">
+                        {apps.length > 1 ? (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="h-9 min-w-44 justify-between gap-3 rounded-md px-3"
+                                    >
+                                        <span className="flex min-w-0 items-center gap-2">
+                                            <CurrentAppIcon className="h-4 w-4 shrink-0 text-primary" />
+                                            <span className="truncate font-medium text-foreground">
+                                                {currentApp?.name || appSlug}
+                                            </span>
+                                        </span>
+                                        <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-56">
+                                    <DropdownMenuLabel>Ganti aplikasi</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    {apps.map((app) => {
+                                        const Icon = resolveIcon(app.icon, Store);
+                                        const isActive = app.slug === appSlug;
+
+                                        return (
+                                            <DropdownMenuItem key={app.id} asChild>
+                                                <Link
+                                                    to={`/t/${tenantSlug}/${app.slug}/dashboard`}
+                                                    className="flex w-full items-center gap-2"
+                                                >
+                                                    <Icon className="h-4 w-4" />
+                                                    <span className="flex-1">{app.name}</span>
+                                                    {isActive && <Check className="h-4 w-4 text-primary" />}
+                                                </Link>
+                                            </DropdownMenuItem>
+                                        );
+                                    })}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ) : (
+                            <div className="flex h-9 items-center gap-2 rounded-md border px-3">
+                                <CurrentAppIcon className="h-4 w-4 text-primary" />
+                                <span className="font-medium text-foreground">{currentApp?.name || appSlug}</span>
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="text-right">

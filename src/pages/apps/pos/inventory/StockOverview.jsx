@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase.js';
-import { useTenant } from '@/contexts/TenantContext.jsx'; // Assuming tenant context exists as used before
+import { useTenant } from '@/contexts/TenantContext.jsx';
 import { Button } from '@/components/ui/button.jsx';
 import { Input } from '@/components/ui/input.jsx';
 import {
@@ -12,13 +11,14 @@ import {
     TableRow,
 } from "@/components/ui/table.jsx";
 import { Download, Loader2, Search } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast.jsx';
+import { inventoryPageService } from '@/services/inventoryPageService.js';
 
 export default function StockOverview() {
     const { tenant } = useTenant();
     const [batches, setBatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         if (tenant) fetchStock();
@@ -27,23 +27,11 @@ export default function StockOverview() {
     const fetchStock = async () => {
         try {
             setLoading(true);
-            // Fetch batches with non-zero quantity (optional, but usually preferred)
-            const { data, error } = await supabase
-                .from('t_inventory_batches')
-                .select(`
-                    *,
-                    m_products ( name, sku, m_units ( symbol ) ),
-                    m_locations ( name )
-                `)
-                .eq('tenant_id', tenant.id)
-                .gt('quantity', 0)
-                .order('expiry_date', { ascending: true }); // Expiring first
-
-            if (error) throw error;
-            setBatches(data || []);
+            setErrorMessage('');
+            const data = await inventoryPageService.getOverviewBatches(tenant.id);
+            setBatches(data);
         } catch (error) {
-            console.error('Error fetching stock:', error);
-            // Silent error or toast? Toast is better.
+            setErrorMessage(error.message || 'Gagal memuat stok.');
         } finally {
             setLoading(false);
         }
@@ -60,6 +48,7 @@ export default function StockOverview() {
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">Overview Stok</h2>
                     <p className="text-muted-foreground">Lihat stok per batch, lokasi, dan tanggal kadaluarsa.</p>
+                    {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
                 </div>
                 <Button variant="outline">
                     <Download className="mr-2 h-4 w-4" />
@@ -119,7 +108,7 @@ export default function StockOverview() {
                                     <TableCell>{batch.m_locations?.name || '-'}</TableCell>
                                     <TableCell>
                                         {batch.expiry_date
-                                            ? format(new Date(batch.expiry_date), 'dd MMM yyyy')
+                                            ? new Date(batch.expiry_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
                                             : '-'}
                                     </TableCell>
                                     <TableCell className="text-right font-bold">

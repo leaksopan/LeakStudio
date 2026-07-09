@@ -10,7 +10,7 @@ export default function Dashboard() {
                 <h1 className="text-3xl font-bold tracking-tight text-primary">Dashboard</h1>
                 <div className="flex items-center gap-2">
                     <Button asChild>
-                        <Link to="/dashboard/pos">Open POS</Link>
+                        <Link to="/dashboard/tenants">Open Tenants</Link>
                     </Button>
                 </div>
             </div>
